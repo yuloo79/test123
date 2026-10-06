@@ -55,7 +55,7 @@ Things to know:
 - This repository is public, so an address you commit here is public too.
 
 Other settings sit next to the endpoint: `TASK_ID_PREFIX` (task IDs look like
-`UOB-ITPM-0009`), `EMAIL_SUBJECT_TAG` and `FORMSUBMIT_TIMEOUT_MS`.
+`ITPM-0009`), `EMAIL_SUBJECT_TAG` and `FORMSUBMIT_TIMEOUT_MS`.
 
 ## Checks and deployment
 
