@@ -8,6 +8,8 @@ and it is not connected to any real system.
 
 **Live site:** https://yuloo79.github.io/test123/
 
+![The IT PMO Kanban board: a summary strip, the Add Task form, filters, and four columns of task cards](docs/screenshot.png)
+
 ## What it does
 
 - Four fixed columns: Backlog, In Progress, Blocked, Done, each with a live task count.

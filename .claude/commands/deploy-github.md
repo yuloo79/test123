@@ -1,8 +1,8 @@
 ---
-description: Publish this project to a GitHub repo. Scans for sensitive data, writes the README, sets up the CI/CD workflow and GitHub Pages, and fills in the repo About section with the live link.
+description: Publish this project to a GitHub repo. Scans for sensitive data, writes the README with a screenshot of the site, sets up the CI/CD workflow and GitHub Pages, and fills in the repo About section with the live link.
 argument-hint: <github-repo-url>
 disable-model-invocation: true
-allowed-tools: Bash(git *) Bash(gh *) Read Write Edit Grep Glob
+allowed-tools: Bash(git *) Bash(gh *) mcp__playwright__* Read Write Edit Grep Glob
 ---
 
 # Publish this project to GitHub
@@ -116,6 +116,7 @@ describe what is actually there.
 - State only what the code does. No invented features, badges for things that
   do not exist, or placeholder sections.
 - Add the workflow status badge once the workflow file exists.
+- Leave room for the screenshot under the live link. Step 9 captures it.
 
 ### 6. CI/CD workflow
 
@@ -164,7 +165,36 @@ deploys already exists, edit it rather than adding a second one.
 - When the deploy job is green, confirm Pages reports a built site:
   `gh api repos/OWNER/REPO/pages --jq '{status, html_url}'`.
 
-### 9. About section
+### 9. Screenshot for the README
+
+Capture what a visitor sees and show it near the top of the README.
+
+- Use the Playwright MCP tools (`mcp__playwright__browser_resize`,
+  `mcp__playwright__browser_navigate`, `mcp__playwright__browser_take_screenshot`).
+  Set the window to 1440 by 900, open the page, wait until its content has
+  rendered, and take a full-page PNG.
+- Capture the live Pages address from step 4 once the deploy in step 8 is green.
+- If the live site is not up (Pages not enabled, deploy failed), capture the
+  local copy instead and say so in the report. Serve the site folder on
+  `localhost` first (for example `python3 -m http.server`), because Playwright
+  MCP blocks `file://` addresses by default. Stop the server afterwards.
+- If the Playwright MCP tools are not connected in this session, use the
+  Playwright library if it is already installed. Otherwise skip this step and
+  report it. Do not install packages or browsers to get around it.
+- Capture the page as it first loads. Do not type into forms or sign in, and
+  look at the image before using it: it must not show personal data, tokens,
+  or anything from a signed-in account.
+- Save it as `docs/screenshot.png`, replacing the old one. If `docs/` is the
+  folder being published as the site, use `.github/screenshot.png` instead so
+  the image is not served.
+- Reference it once in the README, directly under the live link, with alt text
+  that describes the picture: `![...](docs/screenshot.png)`. Update the existing
+  line rather than adding a second image.
+- If the image changed (`git status --short`), commit it with the README and
+  push. That push starts another deploy; there is no need to capture again
+  after it.
+
+### 10. About section
 
 - Description: one plain sentence saying what the project is, 120 characters or
   fewer. Keep an existing description unless it is empty or wrong.
@@ -180,14 +210,15 @@ The topics call replaces the whole list, so include any existing topics worth
 keeping. Then read it back with
 `gh api repos/OWNER/REPO --jq '{description, homepage, topics}'` and check it took.
 
-### 10. Report
+### 11. Report
 
 Finish with a short summary:
 
 - Repo link, branch and commit pushed
 - Live Pages link and whether the last deploy succeeded
 - Security scan result: clean, or what was found and what was done about it
-- What was created or changed: README, workflow, `.gitignore`, About section
+- What was created or changed: README, screenshot (and whether it shows the
+  live site or the local copy), workflow, `.gitignore`, About section
 - Anything skipped or still needing the user (a secret to add, a credential to
   rotate, a setting only they can change)
 
