@@ -94,6 +94,8 @@ The repository carries project-level settings for [Claude Code](https://claude.c
   from [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills), filtered
   through this board's fixed rules. Ask Claude to "review the UI".
 - **Playwright MCP** (`.mcp.json`) gives a session a browser for screenshots and checks.
+  It is set up for Windows and Microsoft Edge: it starts through `cmd /c npx` and opens Edge.
+  On macOS or Linux, change `command` to `npx` and drop the `/c` and `--browser msedge` arguments.
 
 ## Limits
 
