@@ -88,6 +88,20 @@ The repository carries project-level settings for [Claude Code](https://claude.c
   changes to the look stay consistent. They are based on
   [anthropics/skills](https://github.com/anthropics/skills) and
   [leonxlnx/taste-skill](https://github.com/leonxlnx/taste-skill); each folder keeps its licence.
+- **`web-design-guidelines`** (`.claude/skills/`) audits `index.html` for accessibility, focus,
+  forms, motion, touch and copy, using the
+  [Vercel Web Interface Guidelines](https://github.com/vercel-labs/web-interface-guidelines)
+  from [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills), filtered
+  through this board's fixed rules. Ask Claude to "review the UI".
+- **`security-scanner`** (`.claude/agents/`) is a subagent that scans the page, the CI workflow
+  and the repo config for vulnerabilities, classifies each one by severity, CWE and OWASP
+  category, recommends fixes that respect the fixed rules, and writes a Word report to
+  `security-reports/` (git-ignored). Ask Claude to "run the security scanner".
+- **Briefing reminder** (`index.html`, `BRIEFING` constant): a card reading "IT Project Briefing,
+  Wednesday 14 Oct 2026, 2:00 pm, Town Hall Meeting Room" appears 15 seconds after the page
+  loads, once per load, and stops appearing after the date. A Claude Code hook
+  (`.claude/hooks/check-briefing-popup.mjs`, registered in `.claude/settings.json`) re-checks it
+  after every edit to `index.html`.
 - **Playwright MCP** (`.mcp.json`) gives a session a browser for screenshots and checks.
   It is set up for Windows and Microsoft Edge: it starts through `cmd /c npx` and opens Edge.
   On macOS or Linux, change `command` to `npx` and drop the `/c` and `--browser msedge` arguments.

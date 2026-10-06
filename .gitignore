@@ -20,3 +20,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# Security scan reports: keep unpatched findings out of the public repo
+security-reports/

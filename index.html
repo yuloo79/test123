@@ -609,6 +609,36 @@ textarea.input { min-height: 84px; resize: vertical; }
 }
 
 /* =========================================================================
+   10b. BRIEFING REMINDER: floating card shown once, 15 seconds after load
+   ========================================================================= */
+.briefing {
+  position: fixed;
+  inset: auto auto var(--space-4) var(--space-4);
+  z-index: 9;
+  width: min(360px, calc(100vw - 2 * var(--space-4)));
+  margin: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--blue-600);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 8px 24px rgba(10, 35, 66, 0.2);
+}
+
+.briefing__top { display: flex; align-items: flex-start; gap: var(--space-3); }
+.briefing__title { flex: 1; min-width: 0; font-size: var(--text-lg); font-weight: 600; overflow-wrap: anywhere; }
+.briefing__list { display: grid; gap: var(--space-1); margin-top: var(--space-3); font-size: var(--text-md); }
+.briefing__list div { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); gap: var(--space-2); }
+.briefing__list dt { color: var(--ink-muted); }
+.briefing__list dd { font-weight: 600; font-variant-numeric: tabular-nums; }
+.briefing__actions { display: flex; justify-content: flex-end; margin-top: var(--space-4); }
+
+@media (max-width: 767.98px) {
+  .briefing { inset: var(--space-4) var(--space-4) auto var(--space-4); width: auto; }
+}
+
+/* =========================================================================
    11. RESPONSIVE + MOTION PREFERENCES
    ========================================================================= */
 @media (max-width: 767.98px) {
@@ -769,6 +799,20 @@ textarea.input { min-height: 84px; resize: vertical; }
 
 <footer class="site-footer">Internal demo and training tool. All projects, people and tasks shown are fictitious.</footer>
 
+<!-- Briefing reminder: opened by showBriefing() after BRIEFING.delayMs, filled from the BRIEFING constant -->
+<dialog class="briefing" id="briefing-popup" aria-labelledby="briefing-title">
+  <div class="briefing__top">
+    <h2 class="briefing__title" id="briefing-title">IT Project Briefing</h2>
+    <button type="button" class="icon-btn" id="briefing-close" aria-label="Close briefing reminder">&times;</button>
+  </div>
+  <dl class="briefing__list">
+    <div><dt>Date</dt><dd id="briefing-date"></dd></div>
+    <div><dt>Time</dt><dd id="briefing-time"></dd></div>
+    <div><dt>Venue</dt><dd id="briefing-venue"></dd></div>
+  </dl>
+  <div class="briefing__actions"><button type="button" class="btn btn--small" id="briefing-ok">Got it</button></div>
+</dialog>
+
 <!-- Toasts (visible) and a quiet status line for screen readers (moves, deletes) -->
 <div class="toast-region" id="toast-region" role="status" aria-live="polite"></div>
 <div class="sr-only" id="sr-status" role="status" aria-live="polite"></div>
@@ -816,6 +860,16 @@ const CATEGORIES = ["Application Development", "Infrastructure", "Cybersecurity"
 const PRIORITIES = ["Critical", "High", "Medium", "Low"];
 
 const LIMITS = { title: 80, description: 500, assignee: 60 };
+
+// Reminder card shown once per page load after the viewer has stayed delayMs.
+// It is skipped once the briefing date has passed. Change the briefing here only.
+const BRIEFING = {
+  title: "IT Project Briefing",
+  date: "2026-10-14",        // Wednesday, YYYY-MM-DD
+  time: "2:00 pm",
+  venue: "Town Hall Meeting Room",
+  delayMs: 15000,            // 15 seconds on the page
+};
 
 /* =========================================================================
    3. STATE: the single source of truth. Lives in memory only, so a page
@@ -1442,6 +1496,37 @@ function fillSelect(id, options, { placeholder = "", selected = "" } = {}) {
 }
 
 /* =========================================================================
+   11b. BRIEFING REMINDER: floating card, opened once after BRIEFING.delayMs
+   ========================================================================= */
+function showBriefing() {
+  const popup = $("#briefing-popup");
+  if (!popup || popup.open || BRIEFING.date < isoDate()) return;  // nothing to remind once it has passed
+
+  const [y, m, d] = BRIEFING.date.split("-").map(Number);
+  const day = new Date(y, m - 1, d).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short", year: "numeric" });
+  $("#briefing-title").textContent = BRIEFING.title;
+  $("#briefing-date").textContent = day;
+  $("#briefing-time").textContent = BRIEFING.time;
+  $("#briefing-venue").textContent = BRIEFING.venue;
+
+  // show() is non-modal but moves focus to the first button, so hand focus back to
+  // whatever the user was typing in
+  const previous = document.activeElement;
+  popup.show();
+  if (previous && previous !== document.body && previous.focus) previous.focus();
+  announce(`Reminder: ${BRIEFING.title}, ${day}, ${BRIEFING.time}, ${BRIEFING.venue}`);
+}
+
+function setUpBriefing() {
+  const popup = $("#briefing-popup");
+  const close = () => popup.close();
+  $("#briefing-close").addEventListener("click", close);
+  $("#briefing-ok").addEventListener("click", close);
+  popup.addEventListener("keydown", (event) => { if (event.key === "Escape") close(); });
+  setTimeout(showBriefing, BRIEFING.delayMs);
+}
+
+/* =========================================================================
    12. INIT
    ========================================================================= */
 function init() {
@@ -1478,6 +1563,7 @@ function init() {
   board.addEventListener("keydown", handleBoardKeydown);
   setUpDragAndDrop(board);
   setUpFilters();
+  setUpBriefing();
 
   // Seed and first paint
   state.tasks = seedTasks();
