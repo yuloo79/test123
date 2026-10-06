@@ -88,6 +88,11 @@ The repository carries project-level settings for [Claude Code](https://claude.c
   changes to the look stay consistent. They are based on
   [anthropics/skills](https://github.com/anthropics/skills) and
   [leonxlnx/taste-skill](https://github.com/leonxlnx/taste-skill); each folder keeps its licence.
+- **`web-design-guidelines`** (`.claude/skills/`) audits `index.html` for accessibility, focus,
+  forms, motion, touch and copy, using the
+  [Vercel Web Interface Guidelines](https://github.com/vercel-labs/web-interface-guidelines)
+  from [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills), filtered
+  through this board's fixed rules. Ask Claude to "review the UI".
 - **Playwright MCP** (`.mcp.json`) gives a session a browser for screenshots and checks.
 
 ## Limits
