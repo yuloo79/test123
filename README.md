@@ -76,12 +76,19 @@ Run the page checks yourself with:
 node .github/scripts/check-page.mjs
 ```
 
-## Publishing command
+## Claude Code setup
 
-`.claude/commands/deploy-github.md` is a [Claude Code](https://claude.com/claude-code) project command.
-In a Claude Code session in this folder, `/deploy-github <repo-url>` scans for
-sensitive data, updates this README, the workflow, GitHub Pages and the repository's
-About section, then pushes.
+The repository carries project-level settings for [Claude Code](https://claude.com/claude-code):
+
+- **`/deploy-github <repo-url>`** (`.claude/commands/deploy-github.md`) scans for sensitive data,
+  updates this README and its screenshot, the workflow, GitHub Pages and the repository's
+  About section, then pushes.
+- **`frontend-design`** and **`high-end-visual-design`** (`.claude/skills/`) are design skills
+  adapted to this board. They hold its design tokens, fixed rules and interface wording, so
+  changes to the look stay consistent. They are based on
+  [anthropics/skills](https://github.com/anthropics/skills) and
+  [leonxlnx/taste-skill](https://github.com/leonxlnx/taste-skill); each folder keeps its licence.
+- **Playwright MCP** (`.mcp.json`) gives a session a browser for screenshots and checks.
 
 ## Limits
 
