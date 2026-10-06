@@ -1,0 +1,89 @@
+# IT PMO Kanban
+
+[![CI and deploy](https://github.com/yuloo79/test123/actions/workflows/deploy.yml/badge.svg)](https://github.com/yuloo79/test123/actions/workflows/deploy.yml)
+
+A single-page Kanban board for a fictitious bank's IT project management office.
+It is a demo and training tool: every project, person and task on it is made up,
+and it is not connected to any real system.
+
+**Live site:** https://yuloo79.github.io/test123/
+
+## What it does
+
+- Four fixed columns: Backlog, In Progress, Blocked, Done, each with a live task count.
+- Drag cards between columns, or use the **Move ▸** button on a card to do the same from the keyboard.
+- Cards show the task ID, title, project, assignee, due date, a priority pill and a category tag.
+  The left border colour follows priority, and past-due tasks that are not Done get an **Overdue** badge.
+- Delete a card with **×**, then confirm with the inline **Delete? Yes / No**.
+- Add tasks from the form. Fields are validated in the page, with the error shown under the field.
+- Filter by project, assignee (contains) and priority.
+- The header shows total tasks, the count per column and the overdue count.
+
+## Run it locally
+
+There is nothing to install or build. Download `index.html` and double-click it.
+
+The whole app is that one file: plain HTML, CSS and JavaScript, with no frameworks,
+no CDN scripts, no fonts and no images.
+
+## Nothing is saved
+
+The board lives in memory only. Refreshing the page resets it to the eight sample
+tasks. This is intended; the app uses no browser storage and no cookies.
+
+## Email notifications (optional)
+
+Adding a task can send an email through [FormSubmit](https://formsubmit.co).
+It is off until you configure it.
+
+1. Open `index.html` and find the first line of the `<script>` block:
+
+   ```js
+   const FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/YOUR_EMAIL@example.com";
+   ```
+
+2. Replace `YOUR_EMAIL@example.com` with the address that should receive the emails.
+3. Add one task. FormSubmit sends a confirmation email to that address.
+   Click the activation link in it. Tasks added after that are emailed.
+
+Things to know:
+
+- While the placeholder address is in place, the page sends nothing.
+- If the email call fails, the card stays on the board and a warning appears.
+- FormSubmit may reject requests from a page opened as a local file. Use the live
+  site, or set `FORMSUBMIT_PAGE_URL` (the line below the endpoint) to the page's address.
+- This repository is public, so an address you commit here is public too.
+
+Other settings sit next to the endpoint: `TASK_ID_PREFIX` (task IDs look like
+`UOB-ITPM-0009`), `EMAIL_SUBJECT_TAG` and `FORMSUBMIT_TIMEOUT_MS`.
+
+## Checks and deployment
+
+Every push and pull request runs [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml):
+
+1. **Secret scan.** [gitleaks](https://github.com/gitleaks/gitleaks) scans the full commit history.
+2. **Page checks.** [`.github/scripts/check-page.mjs`](.github/scripts/check-page.mjs) confirms `index.html`
+   is still self-contained: no external resources, no browser storage, no native
+   dialogs, one `FORMSUBMIT_ENDPOINT` constant, and JavaScript that parses.
+3. **Deploy.** On `main` only, and only if the first two pass, `index.html` is published to GitHub Pages.
+   Nothing else in the repository is served.
+
+Run the page checks yourself with:
+
+```sh
+node .github/scripts/check-page.mjs
+```
+
+## Publishing command
+
+`.claude/commands/deploy-github.md` is a [Claude Code](https://claude.com/claude-code) project command.
+In a Claude Code session in this folder, `/deploy-github <repo-url>` scans for
+sensitive data, updates this README, the workflow, GitHub Pages and the repository's
+About section, then pushes.
+
+## Limits
+
+- No persistence, no accounts, and no sharing between browsers.
+- Drag and drop uses the browser's native API, which most touch screens do not support.
+  Use **Move ▸** on phones and tablets.
+- Email delivery depends on FormSubmit, a third-party service.

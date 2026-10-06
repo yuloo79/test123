@@ -1,0 +1,67 @@
+name: CI and deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Least privilege by default; the deploy job asks for what it needs.
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Secret scan and page checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out (full history, so every commit is scanned)
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Scan for secrets (gitleaks)
+        run: |
+          docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:latest \
+            git --redact --no-banner --verbose /repo
+
+      - name: Check the page
+        run: node .github/scripts/check-page.mjs
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: check
+    # Only the default branch is published; pull requests are checked, never deployed.
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+
+      # Publish the site only, not the README, .claude/ or workflow files.
+      - name: Stage the site
+        run: |
+          mkdir _site
+          cp index.html _site/
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v5
