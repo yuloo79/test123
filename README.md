@@ -97,6 +97,11 @@ The repository carries project-level settings for [Claude Code](https://claude.c
   and the repo config for vulnerabilities, classifies each one by severity, CWE and OWASP
   category, recommends fixes that respect the fixed rules, and writes a Word report to
   `security-reports/` (git-ignored). Ask Claude to "run the security scanner".
+- **Briefing reminder** (`index.html`, `BRIEFING` constant): a card reading "IT Project Briefing,
+  Wednesday 14 Oct 2026, 2:00 pm, Town Hall Meeting Room" appears 15 seconds after the page
+  loads, once per load, and stops appearing after the date. A Claude Code hook
+  (`.claude/hooks/check-briefing-popup.mjs`, registered in `.claude/settings.json`) re-checks it
+  after every edit to `index.html`.
 - **Playwright MCP** (`.mcp.json`) gives a session a browser for screenshots and checks.
   It is set up for Windows and Microsoft Edge: it starts through `cmd /c npx` and opens Edge.
   On macOS or Linux, change `command` to `npx` and drop the `/c` and `--browser msedge` arguments.
