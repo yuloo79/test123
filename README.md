@@ -93,6 +93,10 @@ The repository carries project-level settings for [Claude Code](https://claude.c
   [Vercel Web Interface Guidelines](https://github.com/vercel-labs/web-interface-guidelines)
   from [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills), filtered
   through this board's fixed rules. Ask Claude to "review the UI".
+- **`security-scanner`** (`.claude/agents/`) is a subagent that scans the page, the CI workflow
+  and the repo config for vulnerabilities, classifies each one by severity, CWE and OWASP
+  category, recommends fixes that respect the fixed rules, and writes a Word report to
+  `security-reports/` (git-ignored). Ask Claude to "run the security scanner".
 - **Playwright MCP** (`.mcp.json`) gives a session a browser for screenshots and checks.
   It is set up for Windows and Microsoft Edge: it starts through `cmd /c npx` and opens Edge.
   On macOS or Linux, change `command` to `npx` and drop the `/c` and `--browser msedge` arguments.
